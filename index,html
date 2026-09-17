@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Surprise 🎂</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3, #8e2de2);
+            color: white;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 450px;
+            padding: 35px 25px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .emoji {
+            font-size: 65px;
+            margin-bottom: 20px;
+            animation: bounce 1.5s infinite;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        button {
+            border: none;
+            padding: 14px 25px;
+            border-radius: 30px;
+            background: #fff;
+            color: #e91e63;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.08);
+            background: #ffe1ec;
+        }
+
+        .loader {
+            width: 70px;
+            height: 70px;
+            border: 8px solid rgba(255,255,255,0.3);
+            border-top: 8px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 25px auto;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 18px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: white;
+            transition: width 0.1s;
+        }
+
+        .cake {
+            font-size: 100px;
+            animation: bounce 1.5s infinite;
+            margin: 20px 0;
+        }
+
+        .birthday-title {
+            font-size: 42px;
+            color: #fff;
+            text-shadow: 0 0 15px #ffeb3b;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #fff;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .confetti {
+            position: fixed;
+            top: -20px;
+            font-size: 25px;
+            animation: fall 4s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #fff;
+            }
+
+            to {
+                text-shadow: 0 0 30px #ffeb3b;
+            }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 27px;
+            }
+
+            .birthday-title {
+                font-size: 32px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE 1: NAME INPUT -->
+    <section class="page active" id="homePage">
+        <div class="card">
+            <div class="emoji">🎁</div>
+
+            <h1>Special Birthday Surprise 🎂</h1>
+
+            <p>
+                Enter your friend's name to unlock a special surprise 😍
+            </p>
+
+            <input
+                type="text"
+                id="nameInput"
+                placeholder="Enter friend's name"
+            >
+
+            <button onclick="startPrank()">
+                Open Surprise 🎉
+            </button>
+
+            <div class="error" id="errorMessage"></div>
+        </div>
+    </section>
+
+
+    <!-- PAGE 2: PRANK LOADING -->
+    <section class="page" id="prankPage">
+        <div class="card">
+            <div class="emoji">🤖</div>
+
+            <h1 id="loadingTitle">
+                Scanning Your Friend...
+            </h1>
+
+            <div class="loader"></div>
+
+            <p id="loadingText">
+                Checking birthday data...
+            </p>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <h2 id="progressText">0%</h2>
+
+            <div id="prankReveal" class="hidden">
+                <h1>😂 PRANKED! 😂</h1>
+
+                <p id="prankMessage"></p>
+
+                <button onclick="showBirthday()">
+                    Continue 🎂
+                </button>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- PAGE 3: BIRTHDAY WISH -->
+    <section class="page" id="birthdayPage">
+        <div class="card">
+            <div class="emoji">🎉🎈🎊</div>
+
+            <h1 class="birthday-title">
+                Happy Birthday!
+            </h1>
+
+            <h1 id="friendName"></h1>
+
+            <div class="cake">🎂</div>
+
+            <p id="wishMessage"></p>
+
+            <button onclick="celebrate()">
+                Celebrate 🎉
+            </button>
+        </div>
+    </section>
+
+
+    <script>
+        let friendName = "";
+
+        function startPrank() {
+            friendName = document.getElementById("nameInput").value.trim();
+
+            if (friendName === "") {
+                document.getElementById("errorMessage").innerText =
+                    "Please enter your friend's name 😅";
+                return;
+            }
+
+            document.getElementById("homePage").classList.remove("active");
+            document.getElementById("prankPage").classList.add("active");
+
+            runPrank();
+        }
+
+
+        function runPrank() {
+            let progress = 0;
+
+            const progressBar = document.getElementById("progressBar");
+            const progressText = document.getElementById("progressText");
+            const loadingText = document.getElementById("loadingText");
+            const loadingTitle = document.getElementById("loadingTitle");
+
+            const messages = [
+                "Checking birthday data... 🔍",
+                "Finding funny memories... 😂",
+                "Preparing surprise... 🎁",
+                "Loading unlimited happiness... 😍",
+                "Almost ready... 🎂"
+            ];
+
+            const interval = setInterval(() => {
+                progress += 2;
+
+                progressBar.style.width = progress + "%";
+                progressText.innerText = progress + "%";
+
+                if (progress % 20 === 0) {
+                    let index = progress / 20 - 1;
+
+                    if (messages[index]) {
+                        loadingText.innerText = messages[index];
+                    }
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+
+                    loadingTitle.innerText = "System Result Found 😂";
+                    loadingText.classList.add("hidden");
+                    document.querySelector(".loader").classList.add("hidden");
+                    document.querySelector(".progress-container").classList.add("hidden");
+                    progressText.classList.add("hidden");
+
+                    document.getElementById("prankReveal").classList.remove("hidden");
+
+                    document.getElementById("prankMessage").innerText =
+                        friendName +
+                        ", you have officially been selected for unlimited birthday wishes! 😂🎉";
+                }
+            }, 100);
+        }
+
+
+        function showBirthday() {
+            document.getElementById("prankPage").classList.remove("active");
+            document.getElementById("birthdayPage").classList.add("active");
+
+            document.getElementById("friendName").innerText =
+                friendName + " ❤️";
+
+            document.getElementById("wishMessage").innerText =
+                "Wishing you a very Happy Birthday! 🎂 May your life be filled with happiness, success, love, laughter and beautiful memories. Keep smiling and enjoy your special day! 🎉🥳";
+
+            celebrate();
+        }
+
+
+        function celebrate() {
+            const emojis = [
+                "🎉",
+                "🎊",
+                "🎈",
+                "✨",
+                "💖",
+                "🥳",
+                "🎂",
+                "🌟"
+            ];
+
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement("div");
+
+                confetti.classList.add("confetti");
+
+                confetti.innerText =
+                    emojis[Math.floor(Math.random() * emojis.length)];
+
+                confetti.style.left =
+                    Math.random() * 100 + "vw";
+
+                confetti.style.animationDuration =
+                    2 + Math.random() * 3 + "s";
+
+                confetti.style.fontSize =
+                    18 + Math.random() * 20 + "px";
+
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+
+</body>
+</html>
